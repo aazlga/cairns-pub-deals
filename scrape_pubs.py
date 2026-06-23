@@ -1,75 +1,55 @@
 import os
 import json
-import urllib.request
 import google.generativeai as genai
 
 # 1. Initialize Gemini
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-model = genai.GenerativeModel('gemini-1.5-flash')
 
-# 2. Define the target specials page for The Crown Hotel
-URLS_TO_TRACK = {
-    "The Crown Hotel": "https://www.thecrownhotelcairns.com.au/daily-specials"
-}
+# We use gemini-1.5-flash as it supports the search retrieval tool
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 all_scraped_deals = []
 
-for venue_name, url in URLS_TO_TRACK.items():
-    try:
-        # Advanced headers to bypass 403 Forbidden firewall blocks
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.5',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1'
-        }
-        
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req, timeout=15) as response:
-            raw_html = response.read().decode('utf-8', errors='ignore')
-        
-        # Strip code bloat to optimize token usage
-        lines = [line.strip() for line in raw_html.split('\n') if line.strip()]
-        clean_text = " ".join(lines)[:25000]
+try:
+    # 2. Tell Gemini exactly what to search for and how to format it
+    prompt = """
+    Search the live web for the current weekly food and drink specials at 'The Crown Hotel' on Shields St in Cairns. 
+    Look for their daily deals like Steak nights, Parmy nights, or Happy Hours.
 
-        # 3. Prompt Gemini to map data perfectly to your frontend layout
-        prompt = f"""
-        You are a data extraction bot for a local restaurant app. 
-        Analyze the following webpage content from "{venue_name}" and extract any weekly food or drink specials (e.g., Steak Night, Schnitzel deals, Trivia meal deals, Happy Hours).
-        
-        Return ONLY a raw, valid JSON array matching this exact schema. Do not wrap it in markdown code blocks or add any introductory or concluding text.
-        [
-          {{
-            "pub": "{venue_name}",
-            "location": "Cairns City",
-            "day": "Monday/Tuesday/Wednesday/Thursday/Friday/Saturday/Sunday/Everyday",
-            "deal": "Clean text details of what the meal deal includes (excluding the price if price is listed separately)",
-            "price": "Include explicit dollar amount if stated, e.g. $15, otherwise leave blank",
-            "url": "{url}",
-            "last_updated": "Weekly Feed"
-          }}
-        ]
+    Return ONLY a raw, valid JSON array matching this exact schema. Do not wrap it in markdown code blocks or add any introductory or concluding text.
+    [
+      {
+        "pub": "The Crown Hotel",
+        "location": "Cairns City",
+        "day": "Monday/Tuesday/Wednesday/Thursday/Friday/Saturday/Sunday/Everyday",
+        "deal": "Clean text details of what the meal deal includes (excluding the price if price is listed separately)",
+        "price": "Include explicit dollar amount if stated, e.g. $15, otherwise leave blank",
+        "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
+        "last_updated": "Weekly Feed"
+      }
+    ]
+    """
 
-        Webpage Content:
-        {clean_text}
-        """
+    # 3. Call Gemini with the google_search_retrieval tool enabled
+    print("Asking Gemini to search the web for The Crown Hotel...")
+    ai_response = model.generate_content(
+        prompt,
+        tools='google_search_retrieval'
+    )
+    
+    # Ensure raw text string cleans out any accidental markdown triple-backticks
+    cleaned_json_text = ai_response.text.strip().replace('```json', '').replace('```', '')
+    venue_deals = json.loads(cleaned_json_text)
+    
+    all_scraped_deals.extend(venue_deals)
+    print("Successfully retrieved deals using Gemini Search Grounding!")
 
-        ai_response = model.generate_content(prompt)
-        
-        # Ensure raw text string cleans out any accidental markdown triple-backticks
-        cleaned_json_text = ai_response.text.strip().replace('```json', '').replace('```', '')
-        venue_deals = json.loads(cleaned_json_text)
-        
-        all_scraped_deals.extend(venue_deals)
-        print(f"Successfully processed {venue_name}")
-
-    except Exception as e:
-        print(f"Error processing {venue_name}: {e}")
+except Exception as e:
+    print(f"Error executing Gemini Search: {e}")
 
 # 4. Save to the public directory for Vercel deployment
 os.makedirs('public', exist_ok=True)
 with open('public/deals.json', 'w') as f:
     json.dump(all_scraped_deals, f, indent=2)
 
-print("Scrape complete! public/deals.json updated.")
+print("Workflow complete! public/deals.json updated.")
