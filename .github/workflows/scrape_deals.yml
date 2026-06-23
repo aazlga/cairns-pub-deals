@@ -1,36 +1,53 @@
 name: Automated Cairns Pub Scraper
 
 on:
-  schedule:
-    # Runs every Monday at 06:00 UTC (4:00 PM Cairns AEST)
-    - cron: '0 6 * * 1'
-  workflow_dispatch: # This adds a "Run workflow" button so you can manually test it anytime!
+  workflow_dispatch:
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout repository code
+    - name: Checkout Repository
       uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-node-version: '20'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install google-generativeai
+    - name: Install Google GenAI Library
+      run: pip install google-generativeai
 
-    - name: Run Scraper Script
+    - name: Run Inline Scraper Script
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      run: python scrape_pubs.py
+      run: |
+        python -c '
+        import os, json, google.generativeai as genai
+        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        
+        try:
+            prompt = """Search the web for the current weekly food and drink specials at The Crown Hotel on Shields St in Cairns. Return ONLY a valid, raw JSON array mapping to this schema with no markdown decoration or extra text:\n[{"pub": "The Crown Hotel", "location": "Cairns City", "day": "Monday", "deal": "Steak Night details", "price": "$15", "url": "https://www.thecrownhotelcairns.com.au/daily-specials", "last_updated": "Weekly Feed"}]"""
+            print("Invoking Gemini Live Web Grounding...")
+            res = model.generate_content(prompt, tools="google_search_retrieval")
+            cleaned = res.text.strip().replace("```json", "").replace("
+```", "")
+            data = json.loads(cleaned)
+            
+            os.makedirs("public", exist_ok=True)
+            with open("public/deals.json", "w") as f:
+                json.dump(data, f, indent=2)
+            print("Successfully updated public/deals.json!")
+        except Exception as e:
+            print(f"Failed execution: {e}")
+            exit(1)
+        '
 
     - name: Commit and Push changes
       run: |
-        git config --global user.name "Cairns Deals Bot"
-        git config --global user.email "bot@cairnsfooddeals.com"
+        git config --global user.name "GitHub Action Bot"
+        git config --global user.email "actions@github.com"
         git add public/deals.json
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Automated update of local pub deals" && git push)
+        git diff-index --quiet HEAD || (git commit -m "Auto-update Crown Hotel pub specials via Gemini" && git push)
