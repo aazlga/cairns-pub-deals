@@ -1,0 +1,36 @@
+name: Automated Cairns Pub Scraper
+
+on:
+  schedule:
+    # Runs every Monday at 06:00 UTC (4:00 PM Cairns AEST)
+    - cron: '0 6 * * 1'
+  workflow_dispatch: # This adds a "Run workflow" button so you can manually test it anytime!
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install google-generativeai
+
+    - name: Run Scraper Script
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      run: python scrape_pubs.py
+
+    - name: Commit and Push changes
+      run: |
+        git config --global user.name "Cairns Deals Bot"
+        git config --global user.email "bot@cairnsfooddeals.com"
+        git add public/deals.json
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Automated update of local pub deals" && git push)
