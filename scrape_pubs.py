@@ -7,10 +7,10 @@ import google.generativeai as genai
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 model = genai.GenerativeModel('gemini-1.5-flash')
 
-# 2. Define the initial Cairns venues to track
+# 2. Define the exact daily specials endpoint for The Crown Hotel
 URLS_TO_TRACK = {
-    "The Crown": "https://www.thecrownhotelcairns.com.au/daily-specials",
-  
+    "The Crown Hotel": "https://www.thecrownhotelcairns.com.au/daily-specials"
+}
 
 all_scraped_deals = []
 
