@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cairns Pub Deals Tracker</title>
+    <style>
+        :root { 
+            --primary: #ff4757; 
+            --bg: #0f1115; 
+            --card-bg: #1a1d24; 
+            --text: #f1f2f6; 
+            --text-light: #a4b0be; 
+            --border: #2f3542;
+            --accent: #ffa502;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; -webkit-font-smoothing: antialiased; }
+        .container { max-width: 600px; margin: 20px auto; padding: 0 10px; }
+        header { text-align: center; margin-bottom: 25px; }
+        h1 { margin: 0 0 8px 0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff; }
+        .subtitle { color: var(--text-light); margin: 0; font-size: 14px; letter-spacing: 0.5px; }
+
+        /* Smooth single-line horizontal day picker with hidden scrollbars */
+        .day-picker { 
+            display: flex; 
+            gap: 6px; 
+            overflow-x: auto; 
+            padding-bottom: 12px; 
+            margin-bottom: 25px; 
+            scrollbar-width: none; 
+            -webkit-overflow-scrolling: touch;
+            justify-content: space-between; 
+        }
+        .day-picker::-webkit-scrollbar { 
+            display: none; 
+        }
+        .day-btn { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border); 
+            padding: 10px 0; 
+            flex: 1; 
+            text-align: center;
+            border-radius: 20px; 
+            font-weight: 600; 
+            font-size: 13px; 
+            cursor: pointer; 
+            color: var(--text-light); 
+            white-space: nowrap; 
+            transition: all 0.2s ease; 
+        }
+        .day-btn.active { 
+            background: var(--primary); 
+            color: white; 
+            border-color: var(--primary); 
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3); 
+        }
+        
+        /* Premium Pub Deal Cards */
+        .deal-card { background: var(--card-bg); border-radius: 14px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 1px solid var(--border); transition: transform 0.15s ease, border-color 0.15s ease; }
+        .deal-card:hover { transform: translateY(-2px); border-color: #57606f; }
+        .card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; gap: 10px; }
+        .pub-name { font-size: 19px; font-weight: 700; color: #ffffff; }
+        .pub-location { font-size: 11px; font-weight: 700; color: var(--accent); background: rgba(255, 165, 2, 0.1); padding: 4px 10px; border-radius: 12px; border: 1px solid rgba(255, 165, 2, 0.2); white-space: nowrap; }
+        .deal-text { font-size: 15px; line-height: 1.6; color: #ced6e0; margin-bottom: 18px; }
+        .price-tag { color: #2ed573; font-weight: bold; margin-right: 5px; }
+        
+        /* Link button */
+        .menu-link { display: inline-flex; align-items: center; justify-content: center; background: var(--border); color: #ffffff; text-decoration: none; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 8px; transition: all 0.15s ease; border: 1px solid transparent; }
+        .menu-link:hover { background: #57606f; border-color: var(--text-light); }
+
+        .loading, .error-msg { text-align: center; color: var(--text-light); font-style: italic; padding: 40px 0; }
+        footer { text-align: center; margin-top: 60px; font-size: 12px; color: var(--text-light); border-top: 1px solid var(--border); padding-top: 20px; line-height: 1.6; }
+        footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Cairns Pub Deals</h1>
+        <p class="subtitle" id="liveDate">Loading daily schedules...</p>
+    </header>
+
+    <!-- Days Picker Row on a Single Line -->
+    <div class="day-picker" id="dayPicker"></div>
+
+    <!-- Target Feed Container -->
+    <div id="dealsContainer">
+        <div class="loading">Fetching live pub menu feeds...</div>
+    </div>
+
+    <footer>
+        Data sourced automatically via AI automation. <br>
+        In partnership with the <a href="https://reddit.com/r/cairnsfood" target="_blank">r/cairnsfood</a> community.
+    </footer>
+</div>
+
+<script>
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    
+    // TIMEZONE FIX: Strictly lock the browser date processing to Australian Eastern Standard Time (Cairns)
+    const localCairnsString = new Date().toLocaleString("en-AU", { timeZone: "Australia/Brisbane", weekday: "long" });
+    let selectedDay = localCairnsString;
+    
+    let masterDealsArray = [];
+
+    // Render single-line navigation track layout
+    const picker = document.getElementById('dayPicker');
+    days.forEach(day => {
+        const btn = document.createElement('button');
+        btn.className = `day-btn ${day === selectedDay ? 'active' : ''}`;
+        
+        // Mark button as "Today" if it aligns with Cairns local calendar day
+        btn.innerText = day === selectedDay ? `Today (${day.slice(0,3)})` : day;
+        btn.onclick = () => filterDay(day, btn);
+        picker.appendChild(btn);
+    });
+
+    function filterDay(day, clickedBtn) {
+        selectedDay = day;
+        document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+        clickedBtn.classList.add('active');
+        renderDeals();
+    }
+
+    function renderDeals() {
+        const container = document.getElementById('dealsContainer');
+        container.innerHTML = '';
+
+        const filtered = masterDealsArray.filter(item => 
+            item.day.toLowerCase() === selectedDay.toLowerCase() || item.day.toLowerCase() === 'everyday'
+        );
+
+        if (filtered.length === 0) {
+            container.innerHTML = `<div class="error-msg">No specials recorded for ${selectedDay} yet. Check back soon!</div>`;
+            return;
+        }
+
+        filtered.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'deal-card';
+            
+            // Format price string if provided by the scraper script
+            const displaysPrice = item.price ? `<span class="price-tag">${item.price}</span>` : '';
+
+            let cardHTML = `
+                <div class="card-header">
+                    <span class="pub-name">${item.pub}</span>
+                    <span class="pub-location">${item.location}</span>
+                </div>
+                <div class="deal-text">${displaysPrice}${item.deal}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+            `;
+
+            if (item.url) {
+                cardHTML += `<a href="${item.url}" target="_blank" class="menu-link">View Menu ↗</a>`;
+            } else {
+                cardHTML += `<span></span>`;
+            }
+
+            if (item.last_updated) {
+                cardHTML += `<span style="font-size: 11px; color: var(--text-light); font-style: italic;">Updated: ${item.last_updated}</span>`;
+            }
+
+            cardHTML += `</div>`;
+            card.innerHTML = cardHTML;
+            container.appendChild(card);
+        });
+    }
+
+    // Force date stamp text to render using precise Cairns regional offsets
+    document.getElementById('liveDate').innerText = new Date().toLocaleDateString('en-AU', { timeZone: "Australia/Brisbane", dateStyle: 'full' });
+    
+    // FETCH UPDATE: Points directly to your automated local static JSON file in your Vercel public directory
+    fetch('./deals.json')
+        .then(res => res.json())
+        .then(data => {
+            masterDealsArray = data;
+            renderDeals();
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('dealsContainer').innerHTML = `<div class="error-msg">Failed to load live menu profiles. Please try again.</div>`;
+        });
+</script>
+</body>
+</html>
