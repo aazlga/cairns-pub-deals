@@ -14,7 +14,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-node-version: '20'
+        python-version: '3.10'
 
     - name: Install Google GenAI Library
       run: pip install google-generativeai
@@ -23,27 +23,27 @@ jobs:
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       run: |
-        python -c '
+        python -c "
         import os, json, google.generativeai as genai
-        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        genai.configure(api_key=os.environ['GEMINI_API_KEY'])
+        model = genai.GenerativeModel('gemini-1.5-flash')
         
         try:
-            prompt = """Search the web for the current weekly food and drink specials at The Crown Hotel on Shields St in Cairns. Return ONLY a valid, raw JSON array mapping to this schema with no markdown decoration or extra text:\n[{"pub": "The Crown Hotel", "location": "Cairns City", "day": "Monday", "deal": "Steak Night details", "price": "$15", "url": "https://www.thecrownhotelcairns.com.au/daily-specials", "last_updated": "Weekly Feed"}]"""
-            print("Invoking Gemini Live Web Grounding...")
-            res = model.generate_content(prompt, tools="google_search_retrieval")
-            cleaned = res.text.strip().replace("```json", "").replace("
-```", "")
+            prompt = 'Search the web for the current weekly food and drink specials at The Crown Hotel on Shields St in Cairns. Return ONLY a valid, raw JSON array mapping to this schema with no markdown decoration or extra text: [{\"pub\": \"The Crown Hotel\", \"location\": \"Cairns City\", \"day\": \"Monday\", \"deal\": \"Steak Night\", \"price\": \"$18\", \"url\": \"https://www.thecrownhotelcairns.com.au/daily-specials\", \"last_updated\": \"Weekly Feed\"}]'
+            print('Invoking Gemini Live Web Grounding...')
+            res = model.generate_content(prompt, tools='google_search_retrieval')
+            cleaned = res.text.strip().replace('```json', '').replace('
+```', '')
             data = json.loads(cleaned)
             
-            os.makedirs("public", exist_ok=True)
-            with open("public/deals.json", "w") as f:
+            os.makedirs('public', exist_ok=True)
+            with open('public/deals.json', 'w') as f:
                 json.dump(data, f, indent=2)
-            print("Successfully updated public/deals.json!")
+            print('Successfully updated public/deals.json!')
         except Exception as e:
-            print(f"Failed execution: {e}")
+            print(f'Failed execution: {e}')
             exit(1)
-        '
+        "
 
     - name: Commit and Push changes
       run: |
