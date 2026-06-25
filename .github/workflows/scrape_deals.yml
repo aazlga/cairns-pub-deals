@@ -7,9 +7,16 @@ jobs:
   scrape:
     runs-on: ubuntu-latest
 
+    # Grants the GitHub Action runner explicit permission to write commits back to your repo
+    permissions:
+      contents: write
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
+      with:
+        # Fetches all history so rebase operations don't fail on a shallow clone
+        fetch-depth: 0
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -24,9 +31,19 @@ jobs:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       run: python scrape_pubs.py
 
-   - name: Commit and Push changes
+    - name: Commit and Push changes
       run: |
         git config --global user.name "GitHub Action Bot"
         git config --global user.email "actions@github.com"
+        
+        # 1. Pull any remote edits immediately before modifying files to stay synchronized
+        git pull origin main --rebase
+        
+        # 2. Stage and commit changes if there is a difference
         git add public/deals.json
-        git diff-index --quiet HEAD || (git commit -m "Auto-update Crown Hotel pub specials via Gemini" && git pull --rebase origin main && git push)
+        if ! git diff-index --quiet HEAD; then
+          git commit -m "Auto-update pub specials via Gemini"
+          git push origin main
+        else
+          print("No changes detected in deals.json. Skipping push.")
+        fi
