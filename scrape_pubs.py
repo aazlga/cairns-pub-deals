@@ -7,10 +7,11 @@ try:
     # The new client automatically picks up GEMINI_API_KEY from os.environ
     client = genai.Client()
     
-    prompt = (
-        "Search the web for the current weekly food and drink specials at The Crown Hotel on Shields St in Cairns. "
-        "Return ONLY a valid, raw JSON array mapping to this schema with no markdown decoration or extra text: "
-        '[{"pub": "The Crown Hotel", "location": "Cairns City", "day": "Monday", "deal": "Steak Night", "price": "$18", "url": "https://www.thecrownhotelcairns.com.au/daily-specials", "last_updated": "Weekly Feed"}]'
+  prompt = (
+        "Search the web for the exact current daily food specials listed on the official website for The Crown Hotel in Cairns (https://www.thecrownhotelcairns.com.au/daily-specials). "
+        "Extract the actual meal and price for each day of the week from the text. Do not make up or guess any prices. "
+        "Return ONLY a valid, raw JSON array mapping exactly to this schema structure with no markdown decoration, no ```json tags, and no extra text: "
+        '[{"pub": "The Crown Hotel", "location": "Cairns City", "day": "Monday", "deal": "Actual Deal Text Here", "price": "$Actual Price", "url": "[https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials)", "last_updated": "June 2026"}]'
     )
     
     print('Invoking Gemini Live Web Grounding...')
@@ -19,8 +20,8 @@ try:
         model='gemini-2.5-flash',
         contents=prompt,
         config=types.GenerateContentConfig(
-            tools=[{"google_search": {}}],  # This turns on live web search
-            temperature=0.0
+            tools=[{"google_search": {}}],
+            temperature=0.0,  # Forces deterministic, accurate output from the search results
         ),
     )
     
