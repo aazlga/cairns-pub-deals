@@ -2,9 +2,18 @@
   {
     "pub": "The Crown Hotel",
     "location": "Cairns City",
-    "day": "Wednesday",
-    "deal": "Burger & Schooner",
-    "price": "$20",
+    "day": "Monday",
+    "deal": "Steak Sandwich, chips & salad",
+    "price": "$18",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "Weekly Feed"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns City",
+    "day": "Tuesday",
+    "deal": "T-Bone Steak, chips & salad",
+    "price": "$27",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
     "last_updated": "Weekly Feed"
   },
@@ -12,7 +21,7 @@
     "pub": "The Crown Hotel",
     "location": "Cairns City",
     "day": "Wednesday",
-    "deal": "Wings & Schooner",
+    "deal": "Fish & chips & salad",
     "price": "$20",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
     "last_updated": "Weekly Feed"
@@ -21,7 +30,7 @@
     "pub": "The Crown Hotel",
     "location": "Cairns City",
     "day": "Thursday",
-    "deal": "Parmy & Schooner",
+    "deal": "Parmy, chips & salad",
     "price": "$20",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
     "last_updated": "Weekly Feed"
@@ -30,16 +39,7 @@
     "pub": "The Crown Hotel",
     "location": "Cairns City",
     "day": "Friday",
-    "deal": "T-Bone Steak & Schooner",
-    "price": "$25",
-    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
-    "last_updated": "Weekly Feed"
-  },
-  {
-    "pub": "The Crown Hotel",
-    "location": "Cairns City",
-    "day": "Friday",
-    "deal": "Rump Steak & Schooner",
+    "deal": "Rump Steak, chips & salad",
     "price": "$22",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
     "last_updated": "Weekly Feed"
@@ -47,27 +47,9 @@
   {
     "pub": "The Crown Hotel",
     "location": "Cairns City",
-    "day": "Friday",
-    "deal": "Wings & Schooner",
-    "price": "$20",
-    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
-    "last_updated": "Weekly Feed"
-  },
-  {
-    "pub": "The Crown Hotel",
-    "location": "Cairns City",
     "day": "Saturday",
-    "deal": "Fish n Chips & Schooner",
-    "price": "$20",
-    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
-    "last_updated": "Weekly Feed"
-  },
-  {
-    "pub": "The Crown Hotel",
-    "location": "Cairns City",
-    "day": "Saturday",
-    "deal": "Wings & Schooner",
-    "price": "$20",
+    "deal": "Sirloin, chips & salad",
+    "price": "$27",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
     "last_updated": "Weekly Feed"
   },
@@ -75,7 +57,7 @@
     "pub": "The Crown Hotel",
     "location": "Cairns City",
     "day": "Sunday",
-    "deal": "Wings & Schooner",
+    "deal": "Roast of the Day",
     "price": "$20",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
     "last_updated": "Weekly Feed"
