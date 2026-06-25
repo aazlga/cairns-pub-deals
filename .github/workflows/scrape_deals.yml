@@ -17,7 +17,7 @@ jobs:
         python-version: '3.10'
 
     - name: Install Google GenAI Library
-      run: pip install google-generativeai
+      run: pip install google-genai pydantic
 
     - name: Run Scraper Script
       env:
