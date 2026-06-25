@@ -1,5 +1,6 @@
 import os
 import json
+import time
 from google import genai
 from google.genai import types
 
@@ -25,44 +26,50 @@ def get_pub_deals(client, venue_name, url):
     ]
     """
     
-    print(f"Invoking Gemini Live Web Grounding for {venue_name}...")
-    
-    response = client.models.generate_content(
-        model='gemini-2.5-flash',
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            tools=[{"google_search": {}}],
-            temperature=0.0,
-        ),
-    )
-    
-    # Clean standard Markdown code blocks
-    raw_text = response.text.strip()
-    cleaned = raw_text.replace('```json', '').replace('```', '').strip()
-    
-    try:
-        return json.loads(cleaned)
-    except Exception as parse_error:
-        print(f"Failed parsing data for {venue_name}: {parse_error}")
-        return []
+    # Retry loop configuration (Max 3 attempts if server hits a 503 blip)
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            print(f"Invoking Gemini Live Web Grounding for {venue_name} (Attempt {attempt + 1}/{max_retries})...")
+            
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    tools=[{"google_search": {}}],
+                    temperature=0.0,
+                ),
+            )
+            
+            raw_text = response.text.strip()
+            cleaned = raw_text.replace('```json', '').replace('```', '').strip()
+            return json.loads(cleaned)
+            
+        except Exception as e:
+            # Check if it looks like a temporary server error
+            if "503" in str(e) or "UNAVAILABLE" in str(e):
+                if attempt < max_retries - 1:
+                    wait_time = (attempt + 1) * 5
+                    print(f"Server busy (503). Retrying in {wait_time} seconds...")
+                    time.sleep(wait_time)
+                    continue
+            print(f"Failed parsing data for {venue_name}: {e}")
+            return []
+    return []
 
 try:
-    # Initialize modern client
     client = genai.Client()
     all_deals = []
     
-    # Map out our venues
     venues = [
         {"name": "The Crown Hotel", "url": "[https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials)"},
         {"name": "Dunwoody's Hotel", "url": "[https://dunwoodys.com.au/whats-on/](https://dunwoodys.com.au/whats-on/)"}
     ]
     
-    # Step through each venue and aggregate the payloads
     for venue in venues:
         deals = get_pub_deals(client, venue["name"], venue["url"])
         all_deals.extend(deals)
         
-    # Write the unified dataset back to public directory
     os.makedirs('public', exist_ok=True)
     with open('public/deals.json', 'w') as f:
         json.dump(all_deals, f, indent=2)
