@@ -2,39 +2,59 @@ import os
 import json
 from google import genai
 from google.genai import types
+from pydantic import BaseModel, Field
+
+class Deal(BaseModel):
+    pub: str = Field(description="Name of the pub, exactly 'The Crown Hotel'")
+    location: str = Field(description="Location of the pub, e.g., 'Cairns City'")
+    day: str = Field(description="The day of the week, e.g., Monday, Tuesday, Wednesday...")
+    deal: str = Field(description="The exact food or drink deal text pulled from the website, e.g. 'Steak Sandwich, chips & salad'")
+    price: str = Field(description="The actual price with dollar sign, e.g. '$18'")
+    url: str = Field(description="The exact URL of the specials webpage")
+    last_updated: str = Field(description="The month and year when parsed, e.g., 'June 2026'")
+
+class PubDealsResponse(BaseModel):
+    deals: list[Deal] = Field(description="A collection of the extracted daily specials")
 
 try:
-    # The new client automatically picks up GEMINI_API_KEY from os.environ
+    # Initialize modern Google GenAI Client
     client = genai.Client()
     
-  prompt = (
-        "Search the web for the exact current daily food specials listed on the official website for The Crown Hotel in Cairns (https://www.thecrownhotelcairns.com.au/daily-specials). "
-        "Extract the actual meal and price for each day of the week from the text. Do not make up or guess any prices. "
-        "Return ONLY a valid, raw JSON array mapping exactly to this schema structure with no markdown decoration, no ```json tags, and no extra text: "
-        '[{"pub": "The Crown Hotel", "location": "Cairns City", "day": "Monday", "deal": "Actual Deal Text Here", "price": "$Actual Price", "url": "[https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials)", "last_updated": "June 2026"}]'
+    # We describe only the search objective. No dummy prices or placeholder deals are present
+    # to confuse the grounding engine.
+    prompt = (
+        "Search the web for the exact daily food and drink specials currently listed on the official website "
+        "of The Crown Hotel in Cairns (https://www.thecrownhotelcairns.com.au/daily-specials). "
+        "Extract the real, actual meal and price for each day of the week. "
+        "Do not make up, extrapolate, or guess any prices or items."
     )
     
-    print('Invoking Gemini Live Web Grounding...')
-    
+    print('Invoking Gemini Live Web Grounding with Structured Outputs...')
+
     response = client.models.generate_content(
         model='gemini-2.5-flash',
         contents=prompt,
         config=types.GenerateContentConfig(
             tools=[{"google_search": {}}],
-            temperature=0.0,  # Forces deterministic, accurate output from the search results
+            # This instructs Gemini to guarantee the output adheres perfectly to our Pydantic schema structure
+            response_mime_type="application/json",
+            response_schema=PubDealsResponse,
+            temperature=0.0,
         ),
     )
     
-    # Clean up any accidental markdown code blocks if the model includes them
-    cleaned = response.text.strip().replace('```json', '').replace('```', '')
-    data = json.loads(cleaned)
+    # The output is guaranteed to be clean JSON conforming to PubDealsResponse schema
+    raw_data = json.loads(response.text)
     
-    # Ensure directory exists and save
+    # Unpack the list of deals to match the exact flat array format the frontend expects
+    flat_deals_list = raw_data.get("deals", [])
+    
+    # Ensure the public directories are ready and save the result
     os.makedirs('public', exist_ok=True)
     with open('public/deals.json', 'w') as f:
-        json.dump(data, f, indent=2)
+        json.dump(flat_deals_list, f, indent=2)
         
-    print('Successfully updated public/deals.json!')
+    print(f"Successfully scraped and updated {len(flat_deals_list)} real specials in public/deals.json!")
 
 except Exception as e:
     print(f'Failed execution: {e}')
