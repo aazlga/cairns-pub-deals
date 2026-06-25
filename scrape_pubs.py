@@ -7,13 +7,25 @@ try:
     # Initialize the modern Gemini Client
     client = genai.Client()
     
-    # Simple, direct prompt asking for raw JSON matching your exact array structure
-    prompt = (
-        "Search the web for the current daily food and drink specials listed on the official website "
-        "of The Crown Hotel on Shields St in Cairns. Extract the actual meal and price for each day. "
-        "Return ONLY a valid, raw JSON array mapping exactly to this schema structure with no markdown decoration or extra text: "
-        '[{"pub": "The Crown Hotel", "location": "Cairns City", "day": "Monday", "deal": "Steak Night", "price": "$18", "url": "https://www.thecrownhotelcairns.com.au/daily-specials", "last_updated": "Weekly Feed"}]'
-    )
+    # Using a single triple-quoted string to avoid indentation and line-wrap bugs
+    prompt = """
+Search the web for the exact current daily food specials listed on the official website for The Crown Hotel in Cairns (https://www.thecrownhotelcairns.com.au/daily-specials).
+
+Extract the actual meal and price for each day of the week. Do not make up or guess any prices.
+
+Return ONLY a valid, raw JSON array mapping exactly to this schema structure with no markdown decoration, no ```json tags, and no extra text:
+[
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns City",
+    "day": "Monday",
+    "deal": "Actual Deal Text Here",
+    "price": "$Actual Price Here",
+    "url": "[https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials)",
+    "last_updated": "June 2026"
+  }
+]
+"""
     
     print('Invoking Gemini Live Web Grounding...')
     
