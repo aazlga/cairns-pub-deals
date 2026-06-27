@@ -31,13 +31,17 @@ def get_pub_deals(client, venue_name, url):
        - "site:{domain} whats on"
        - "site:{domain} deals"
        - "site:{domain} Monday" (and other days of the week to look up specific event pages)
-    2. Read the search snippets carefully to locate the actual active weekly meal/drink deals.
+       - "site:{domain} Friday"
+    2. Read the search snippets carefully to locate the actual active weekly meal/drink deals, entertainment, or special promotions.
     
     CRITICAL EXTRACTION RULES:
-    - Extract ONLY real, active specials currently offered.
-    - If a specific day of the week (Monday through Sunday) does not have a food or drink special explicitly listed, do NOT include that day in the output.
-    - Do NOT invent, guess, or extrapolate any deals. If you cannot verify a deal for a day, skip that day completely.
-    - If you find a valid special but no price is mentioned, set the price field to "Varies" or "Free" (if applicable).
+    - Extract ONLY real, active specials, promotions, or club offers currently advertised on the site.
+    - If a specific day of the week (Monday through Sunday) has an active offer, inclusion of it is MANDATORY.
+    - Do NOT discard an offer just because it lacks a standard numeric price tag (e.g., "$20"). 
+      - If the offer is "Kids Eat Free", extract the deal and set the price to "Free" (or "With purchase").
+      - If the offer is "Trivia", set the price to "Free".
+      - If the offer is "Tradie Club" or "Live Entertainment / Live Music", extract the description and set the price to "Free" or "No Cover" or "Varies".
+    - Do NOT invent, guess, or extrapolate any deals. If you cannot verify an offer/special for a day in any search context, skip that day.
 
     OUTPUT SCHEMA:
     Return ONLY a valid, raw JSON array of objects mapping to this exact schema structure. 
@@ -48,7 +52,7 @@ def get_pub_deals(client, venue_name, url):
         "location": "Cairns",
         "day": "Day of the week (e.g., Monday)",
         "deal": "Exact name of the special / description found",
-        "price": "Price found (e.g., $20 or Varies or Free)",
+        "price": "Price or value found (e.g., $20, Free, No Cover, or Varies)",
         "url": "{url}",
         "last_updated": "June 2026"
       }}
@@ -94,6 +98,7 @@ try:
     client = genai.Client()
     all_deals = []
     
+    # Restored clean URL strings to prevent split and domain parsing errors
     venues = [
         {
             "name": "The Crown Hotel", 
