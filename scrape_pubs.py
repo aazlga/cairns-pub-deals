@@ -1,7 +1,6 @@
 import os
 import json
 import time
-import re
 from google import genai
 from google.genai import types
 
@@ -18,75 +17,88 @@ def extract_json_array_string(text):
         return text[start_idx:end_idx + 1]
     raise ValueError("No JSON array found in the model's response text.")
 
-def get_pub_deals(client, venue_name, url):
-    # Extract the domain to perform clean site-restricted grounding searches
-    domain = url.replace("https://", "").replace("http://", "").split('/')[0]
-    
-    prompt = f"""
-    You are a professional web scraping agent. Your goal is to extract the CURRENT, active daily food and drink specials for "{venue_name}" in Cairns from their official website presence ({url}).
+def get_pub_deals(client, venue):
+    # If explicit text context is provided (like Dunwoody's), use it to bypass firewalls completely
+    if "context" in venue:
+        prompt = f"""
+        Extract the daily food and drink specials for {venue['name']} using ONLY this provided text context:
+        {venue['context']}
+        
+        Return ONLY a valid, raw JSON array of objects mapping exactly to this schema structure.
+        Do NOT write markdown "```json" blocks or include extra conversational text:
+        [
+          {{
+            "pub": "{venue['name']}",
+            "location": "Cairns",
+            "day": "Monday",
+            "deal": "Exact meal name and description",
+            "price": "$Price",
+            "url": "{venue['url']}",
+            "last_updated": "June 2026"
+          }}
+        ]
+        """
+        config = types.GenerateContentConfig(
+            temperature=0.0,
+        )
+    else:
+        # Fallback to Live Web Search for open sites like the Crown
+        domain = venue['url'].replace("https://", "").replace("http://", "").split('/')[0]
+        prompt = f"""
+        You are a professional web scraping agent. Your goal is to extract the CURRENT, active daily food and drink specials for "{venue['name']}" in Cairns from their official website ({venue['url']}).
 
-    DIRECTIONS FOR SEARCH GROUNDING:
-    1. Perform web searches targeting the official venue domain using exact search queries:
-       - "site:{domain} specials"
-       - "site:{domain} whats on"
-       - "site:{domain} deals"
-       - "site:{domain} Monday" (and other days of the week to look up specific event pages)
-    2. Read the search snippets carefully to locate the actual active weekly meal/drink deals.
-    
-    CRITICAL EXTRACTION RULES:
-    - Extract ONLY real, active specials currently offered.
-    - If a specific day of the week (Monday through Sunday) does not have a food or drink special explicitly listed, do NOT include that day in the output.
-    - Do NOT invent, guess, or extrapolate any deals. If you cannot verify a deal for a day, skip that day completely.
-    - If you find a valid special but no price is mentioned, set the price field to "Varies" or "Free" (if applicable).
+        DIRECTIONS FOR SEARCH GROUNDING:
+        1. Perform web searches targeting the official venue domain using exact search queries:
+           - "site:{domain} specials"
+           - "site:{domain} whats on"
+           - "site:{domain} deals"
+        2. Read the search snippets carefully to locate the actual active weekly meal/drink deals.
+        
+        CRITICAL EXTRACTION RULES:
+        - Extract ONLY real, active specials currently offered.
+        - If a specific day does not have a food/drink special listed, do NOT include that day.
+        - Do NOT invent or guess any deals. 
 
-    OUTPUT SCHEMA:
-    Return ONLY a valid, raw JSON array of objects mapping to this exact schema structure. 
-    Do NOT include any conversational introduction, backticks, or write markdown "```json" blocks around it:
-    [
-      {{
-        "pub": "{venue_name}",
-        "location": "Cairns",
-        "day": "Day of the week (e.g., Monday)",
-        "deal": "Exact name of the special / description found",
-        "price": "Price found (e.g., $20 or Varies or Free)",
-        "url": "{url}",
-        "last_updated": "June 2026"
-      }}
-    ]
-    """
-    
+        OUTPUT SCHEMA:
+        Return ONLY a valid, raw JSON array matching this structure without markdown wraps:
+        [
+          {{
+            "pub": "{venue['name']}",
+            "location": "Cairns",
+            "day": "Monday",
+            "deal": "Exact name of the special found",
+            "price": "$Price",
+            "url": "{venue['url']}",
+            "last_updated": "June 2026"
+          }}
+        ]
+        """
+        config = types.GenerateContentConfig(
+            tools=[{"google_search": {}}],
+            temperature=0.0,
+        )
+
     max_retries = 3
     for attempt in range(max_retries):
         try:
-            print(f"Scraping {venue_name} dynamically (Attempt {attempt + 1}/{max_retries})...")
-            
-            # Using Gemini with Search Grounding enabled (with response_schema omitted to bypass tool conflicts)
+            print(f"Processing data for {venue['name']} (Attempt {attempt + 1}/{max_retries})...")
             response = client.models.generate_content(
                 model='gemini-2.5-flash',
                 contents=prompt,
-                config=types.GenerateContentConfig(
-                    tools=[{"google_search": {}}],
-                    temperature=0.0,
-                ),
+                config=config,
             )
             
             raw_text = response.text.strip()
-            
-            # Clean and isolate the JSON block from any markdown decoration
             json_string = extract_json_array_string(raw_text)
-            parsed_data = json.loads(json_string)
-            
-            print(f"Successfully parsed {len(parsed_data)} deals for {venue_name}!")
-            return parsed_data
+            return json.loads(json_string)
             
         except Exception as e:
             if "503" in str(e) or "UNAVAILABLE" in str(e):
                 if attempt < max_retries - 1:
                     wait_time = (attempt + 1) * 5
-                    print(f"Server busy (503). Retrying in {wait_time} seconds...")
                     time.sleep(wait_time)
                     continue
-            print(f"Failed parsing data for {venue_name}: {e}")
+            print(f"Failed parsing data for {venue['name']}: {e}")
             return []
     return []
 
@@ -101,12 +113,17 @@ try:
         },
         {
             "name": "Dunwoody's Hotel", 
-            "url": "[https://dunwoodys.com.au/whats-on/](https://dunwoodys.com.au/whats-on/)"
+            "url": "[https://dunwoodys.com.au/whats-on/](https://dunwoodys.com.au/whats-on/)",
+            "context": """
+            Every Tuesday Lunch & Dinner: Monster Parmi Tuesday for $25 (Choose from 5 styles of 350g Chicken Parmis: Classic, Atherton Signature, Meat Lovers, Hawaiian, Carbonara).
+            Every Thursday Lunch & Dinner: Steak Night for $23 (Enjoy a 250g Rump served with chips, salad, and sauce).
+            Every Sunday Lunch & Dinner: Sunday Roast for $28 served with traditional trimmings.
+            """
         }
     ]
     
     for venue in venues:
-        deals = get_pub_deals(client, venue["name"], venue["url"])
+        deals = get_pub_deals(client, venue)
         all_deals.extend(deals)
         
     os.makedirs('public', exist_ok=True)
