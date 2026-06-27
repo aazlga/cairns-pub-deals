@@ -6,8 +6,9 @@ from google.genai import types
 
 def extract_json_array_string(text):
     """
-    Locates the first '[' and last ']' to safely isolate the JSON array block,
-    discarding any markdown formatting tags or conversational text.
+    Locates the first '[' and last ']' to safely isolate the JSON array block.
+    If no array brackets are found (e.g., the model states it found no deals),
+    it returns a valid empty JSON array string rather than crashing.
     """
     text = text.strip()
     start_idx = text.find('[')
@@ -15,10 +16,11 @@ def extract_json_array_string(text):
     
     if start_idx != -1 and end_idx != -1 and start_idx < end_idx:
         return text[start_idx:end_idx + 1]
-    raise ValueError("No JSON array found in the model's response text.")
+    
+    print("No structured JSON array found in response text. Defaulting to empty array.")
+    return "[]"
 
 def get_pub_deals(client, venue_name, url):
-    # Extract the domain safely to perform clean site-restricted grounding searches
     domain = url.replace("https://", "").replace("http://", "").split('/')[0]
     
     prompt = f"""
@@ -62,7 +64,7 @@ def get_pub_deals(client, venue_name, url):
     ]
     """
     
-    max_retries = 3
+    max_retries = 5
     for attempt in range(max_retries):
         try:
             print(f"Scraping {venue_name} dynamically (Attempt {attempt + 1}/{max_retries})...")
@@ -77,8 +79,6 @@ def get_pub_deals(client, venue_name, url):
             )
             
             raw_text = response.text.strip()
-            
-            # Clean and isolate the JSON block from any markdown decoration
             json_string = extract_json_array_string(raw_text)
             parsed_data = json.loads(json_string)
             
@@ -86,13 +86,17 @@ def get_pub_deals(client, venue_name, url):
             return parsed_data
             
         except Exception as e:
-            if "503" in str(e) or "UNAVAILABLE" in str(e):
+            error_msg = str(e).lower()
+            # Detect Rate Limit (429), Quota Exhaustion, or Server Busy (503) errors
+            if "429" in error_msg or "quota" in error_msg or "limit" in error_msg or "503" in error_msg or "unavailable" in error_msg:
                 if attempt < max_retries - 1:
-                    wait_time = (attempt + 1) * 5
-                    print(f"Server busy (503). Retrying in {wait_time} seconds...")
+                    # Progressively wait longer: 15s, 30s, 45s, 60s
+                    wait_time = (attempt + 1) * 15
+                    print(f"Rate limit or quota warning hit for {venue_name}. Backing off for {wait_time} seconds before retry...")
                     time.sleep(wait_time)
                     continue
-            print(f"Failed parsing data for {venue_name}: {e}")
+            
+            print(f"Permanent failure parsing data for {venue_name}: {e}")
             return []
     return []
 
@@ -101,59 +105,28 @@ try:
     all_deals = []
     
     venues = [
-        {
-            "name": "The Crown Hotel", 
-            "url": "[https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials)"
-        },
-        {
-            "name": "Dunwoody's Hotel", 
-            "url": "[https://dunwoodys.com.au/whats-on/](https://dunwoodys.com.au/whats-on/)"
-        },
-        {
-            "name": "The Surf Club Palm Cove",
-            "url": "[https://www.surfclubpalmcove.com.au/menu](https://www.surfclubpalmcove.com.au/menu)"
-        },
-        {
-            "name": "Trinity Beach Sports Club",
-            "url": "[https://trinitybeachsportsclub.com.au/dining-bar/dining/](https://trinitybeachsportsclub.com.au/dining-bar/dining/)"
-        },
-        {
-            "name": "Fuller Sports Club",
-            "url": "[https://www.fullersports.com.au/eat-drink/meal-specials/](https://www.fullersports.com.au/eat-drink/meal-specials/)"
-        },
-        {
-            "name": "South Cairns Sports Club",
-            "url": "[https://southcairnssportsclub.com.au/sirens-restaurant/](https://southcairnssportsclub.com.au/sirens-restaurant/)"
-        },
-        {
-            "name": "Crystalbrook Flynn",
-            "url": "[https://www.crystalbrookcollection.com/flynn/offers](https://www.crystalbrookcollection.com/flynn/offers)"
-        },
-        {
-            "name": "Cazalys Cairns",
-            "url": "[https://cazalys.com.au/barassis-restaurant/](https://cazalys.com.au/barassis-restaurant/)"
-        },
-        {
-            "name": "The Parkview Hotel",
-            "url": "[https://www.theparkviewhotel.com.au/whats-on/](https://www.theparkviewhotel.com.au/whats-on/)"
-        },
-        {
-            "name": "Mount Sheridan Tavern",
-            "url": "[https://mountsheridantavern.com.au/whats-on/](https://mountsheridantavern.com.au/whats-on/)"
-        },
-        {
-            "name": "Muddys Cafe",
-            "url": "[https://muddyscafe.com/menu/](https://muddyscafe.com/menu/)"
-        },
-        {
-            "name": "Oaks Cairns Hotel",
-            "url": "[https://www.oakshotels.com/en/oaks-cairns-hotel/offers](https://www.oakshotels.com/en/oaks-cairns-hotel/offers)"
-        }
+        {"name": "The Crown Hotel", "url": "[https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials)"},
+        {"name": "Dunwoody's Hotel", "url": "[https://dunwoodys.com.au/whats-on/](https://dunwoodys.com.au/whats-on/)"},
+        {"name": "The Surf Club Palm Cove", "url": "[https://www.surfclubpalmcove.com.au/menu](https://www.surfclubpalmcove.com.au/menu)"},
+        {"name": "Trinity Beach Sports Club", "url": "[https://trinitybeachsportsclub.com.au/dining-bar/dining/](https://trinitybeachsportsclub.com.au/dining-bar/dining/)"},
+        {"name": "Fuller Sports Club", "url": "[https://www.fullersports.com.au/eat-drink/meal-specials/](https://www.fullersports.com.au/eat-drink/meal-specials/)"},
+        {"name": "South Cairns Sports Club", "url": "[https://southcairnssportsclub.com.au/sirens-restaurant/](https://southcairnssportsclub.com.au/sirens-restaurant/)"},
+        {"name": "Crystalbrook Flynn", "url": "[https://www.crystalbrookcollection.com/flynn/offers](https://www.crystalbrookcollection.com/flynn/offers)"},
+        {"name": "Cazalys Cairns", "url": "[https://cazalys.com.au/barassis-restaurant/](https://cazalys.com.au/barassis-restaurant/)"},
+        {"name": "The Parkview Hotel", "url": "[https://www.theparkviewhotel.com.au/whats-on/](https://www.theparkviewhotel.com.au/whats-on/)"},
+        {"name": "Mount Sheridan Tavern", "url": "[https://mountsheridantavern.com.au/whats-on/](https://mountsheridantavern.com.au/whats-on/)"},
+        {"name": "Muddys Cafe", "url": "[https://muddyscafe.com/menu/](https://muddyscafe.com/menu/)"},
+        {"name": "Oaks Cairns Hotel", "url": "[https://www.oakshotels.com/en/oaks-cairns-hotel/offers](https://www.oakshotels.com/en/oaks-cairns-hotel/offers)"}
     ]
     
-    for venue in venues:
+    for i, venue in enumerate(venues):
         deals = get_pub_deals(client, venue["name"], venue["url"])
         all_deals.extend(deals)
+        
+        # Apply a spacing window between venues to distribute API workload evenly
+        if i < len(venues) - 1:
+            print("Spacing out requests. Waiting 12 seconds before processing next venue...")
+            time.sleep(12)
         
     os.makedirs('public', exist_ok=True)
     with open('public/deals.json', 'w') as f:
