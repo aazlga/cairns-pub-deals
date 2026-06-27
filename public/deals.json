@@ -12,7 +12,7 @@
     "pub": "The Crown Hotel",
     "location": "Cairns",
     "day": "Wednesday",
-    "deal": "Wings & Schooner - Chicken wings and schooner of house beer",
+    "deal": "Wings & Schooner - Chicken wings and a schooner of house beer",
     "price": "$20",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
     "last_updated": "June 2026"
@@ -30,7 +30,7 @@
     "pub": "The Crown Hotel",
     "location": "Cairns",
     "day": "Thursday",
-    "deal": "Wings & Schooner - Chicken wings and schooner of house beer",
+    "deal": "Wings & Schooner - Chicken wings and a schooner of house beer",
     "price": "$20",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
     "last_updated": "June 2026"
@@ -57,7 +57,7 @@
     "pub": "The Crown Hotel",
     "location": "Cairns",
     "day": "Friday",
-    "deal": "Wings & Schooner - Chicken wings and schooner of house beer",
+    "deal": "Wings & Schooner - Chicken wings and a schooner of house beer",
     "price": "$20",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
     "last_updated": "June 2026"
@@ -75,7 +75,7 @@
     "pub": "The Crown Hotel",
     "location": "Cairns",
     "day": "Saturday",
-    "deal": "Wings & Schooner - Chicken wings and schooner of house beer",
+    "deal": "Wings & Schooner - Chicken wings and a schooner of house beer",
     "price": "$20",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
     "last_updated": "June 2026"
@@ -84,18 +84,9 @@
     "pub": "The Crown Hotel",
     "location": "Cairns",
     "day": "Sunday",
-    "deal": "Wings & Schooner - Chicken wings and schooner of house beer",
+    "deal": "Wings & Schooner - Chicken wings and a schooner of house beer",
     "price": "$20",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "Dunwoody's Hotel",
-    "location": "Cairns",
-    "day": "Thursday",
-    "deal": "Steak Night: 250gm Rump, served with chips, salad & sauce",
-    "price": "$23",
-    "url": "https://dunwoodys.com.au/whats-on/",
     "last_updated": "June 2026"
   }
 ]
