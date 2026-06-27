@@ -1,62 +1,22 @@
 import os
 import json
 import time
-import re
 from google import genai
 from google.genai import types
 
-def extract_json_array_string(text):
-    """
-    Locates the first '[' and last ']' to safely isolate the JSON array block,
-    discarding any markdown formatting tags or conversational text.
-    """
-    text = text.strip()
-    start_idx = text.find('[')
-    end_idx = text.rfind(']')
-    
-    if start_idx != -1 and end_idx != -1 and start_idx < end_idx:
-        return text[start_idx:end_idx + 1]
-    raise ValueError("No JSON array found in the model's response text.")
-
 def get_pub_deals(client, venue_name, url):
-    # Extract the domain to perform clean site-restricted grounding searches
-    domain = url.replace("https://", "").replace("http://", "").split('/')[0]
-    
     prompt = f"""
-    You are a professional web scraping agent. Your goal is to extract the CURRENT, active daily food and drink specials for "{venue_name}" in Cairns from their official website presence ({url}).
+    Search the web for the exact current daily food specials listed on the official website for {venue_name} in Cairns ({url}).
+    Extract the real, actual meal item and price for each day of the week. Do not guess or extrapolate any prices.
 
-    DIRECTIONS FOR SEARCH GROUNDING:
-    1. Perform web searches targeting the official venue domain using exact search queries:
-       - "site:{domain} specials"
-       - "site:{domain} whats on"
-       - "site:{domain} deals"
-       - "site:{domain} Monday" (and other days of the week to look up specific event pages)
-       - "site:{domain} Friday"
-    2. Read the search snippets carefully to locate the actual active weekly food/drink specials.
-    
-    CRITICAL EXTRACTION RULES:
-    - Extract ONLY real, active food and drink specials, including dinner promotions and "Kids Eat Free" offers.
-    - MANDATORILY EXCLUDE any non-dining events, entertainment, or gaming promotions, even if they occur on the premises. Do NOT extract:
-      * Meat raffles, charity raffles, or draws
-      * Live music, bands, DJs, acoustic performances, or live entertainment
-      * Jag the Joker or other promotional bar games/draws
-      * Trivia nights
-      * Poker nights
-    - If a specific day of the week (Monday through Sunday) has an active food/drink special (or Kids Eat Free promotion), inclusion of it is MANDATORY.
-    - Do NOT discard a food offer just because it lacks a standard numeric price tag (e.g., "$20"). 
-      - If the offer is "Kids Eat Free", extract the deal and set the price to "Free" (or "With purchase").
-    - Do NOT invent, guess, or extrapolate any deals. If you cannot verify an active food or drink special for a day in any search context, skip that day.
-
-    OUTPUT SCHEMA:
-    Return ONLY a valid, raw JSON array of objects mapping to this exact schema structure. 
-    Do NOT include any conversational introduction, backticks, or write markdown "```json" blocks around it:
+    Return ONLY a valid, raw JSON array mapping exactly to this schema structure with no markdown decoration, no ```json tags, and no conversational text:
     [
       {{
         "pub": "{venue_name}",
         "location": "Cairns",
-        "day": "Day of the week (e.g., Monday)",
-        "deal": "Exact name of the special / description found",
-        "price": "Price or value found (e.g., $20, Free, or Varies)",
+        "day": "Monday",
+        "deal": "Actual Deal Text Here",
+        "price": "$Actual Price Here",
         "url": "{url}",
         "last_updated": "June 2026"
       }}
@@ -66,9 +26,9 @@ def get_pub_deals(client, venue_name, url):
     max_retries = 3
     for attempt in range(max_retries):
         try:
-            print(f"Scraping {venue_name} dynamically (Attempt {attempt + 1}/{max_retries})...")
+            print(f"Invoking Gemini Live Web Grounding for {venue_name} (Attempt {attempt + 1}/{max_retries})...")
             
-            # Using Gemini with Search Grounding enabled (with response_schema omitted to bypass tool conflicts)
+            # Using search grounding cleanly by dropping response_schema
             response = client.models.generate_content(
                 model='gemini-2.5-flash',
                 contents=prompt,
@@ -80,12 +40,10 @@ def get_pub_deals(client, venue_name, url):
             
             raw_text = response.text.strip()
             
-            # Clean and isolate the JSON block from any markdown decoration
-            json_string = extract_json_array_string(raw_text)
-            parsed_data = json.loads(json_string)
+            # Extract out json array strings if wrapped in markdown formatting tags
+            cleaned = raw_text.replace('```json', '').replace('```', '').strip()
             
-            print(f"Successfully parsed {len(parsed_data)} deals for {venue_name}!")
-            return parsed_data
+            return json.loads(cleaned)
             
         except Exception as e:
             if "503" in str(e) or "UNAVAILABLE" in str(e):
@@ -102,16 +60,9 @@ try:
     client = genai.Client()
     all_deals = []
     
-    # Cleaned URL strings to prevent splitting and parsing crashes
     venues = [
-        {
-            "name": "The Crown Hotel", 
-            "url": "[https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials)"
-        },
-        {
-            "name": "Dunwoody's Hotel", 
-            "url": "[https://dunwoodys.com.au/whats-on/](https://dunwoodys.com.au/whats-on/)"
-        }
+        {"name": "The Crown Hotel", "url": "[https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials)"},
+        {"name": "Dunwoody's Hotel", "url": "[https://dunwoodys.com.au/whats-on/](https://dunwoodys.com.au/whats-on/)"}
     ]
     
     for venue in venues:
