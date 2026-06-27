@@ -18,7 +18,21 @@ def extract_json_array_string(text):
         return text[start_idx:end_idx + 1]
     raise ValueError("No JSON array found in the model's response text.")
 
-def get_pub_deals(client, venue_name, url):
+def clean_target_url(url):
+    """
+    Saves the scraper from breaking if Markdown URLs like [URL](URL) slip in.
+    Extracts the clean, plain URL string.
+    """
+    # Regex to pull out the first absolute http/https link
+    match = re.search(r'https?://[^\s\)]+', url)
+    if match:
+        return match.group(0).strip()
+    return url.strip()
+
+def get_pub_deals(client, venue_name, raw_url):
+    # Ensure the target URL is a clean string (not wrapped in Markdown syntax)
+    url = clean_target_url(raw_url)
+    
     # Extract the domain to perform clean site-restricted grounding searches
     domain = url.replace("https://", "").replace("http://", "").split('/')[0]
     
@@ -84,6 +98,10 @@ def get_pub_deals(client, venue_name, url):
             json_string = extract_json_array_string(raw_text)
             parsed_data = json.loads(json_string)
             
+            # Correctly map back the clean URL to the output objects
+            for item in parsed_data:
+                item["url"] = url
+                
             print(f"Successfully parsed {len(parsed_data)} deals for {venue_name}!")
             return parsed_data
             
@@ -102,7 +120,7 @@ try:
     client = genai.Client()
     all_deals = []
     
-    # Cleaned URL strings to prevent splitting and parsing crashes
+    # Fully cleaned URLs inside our array
     venues = [
         {
             "name": "The Crown Hotel", 
