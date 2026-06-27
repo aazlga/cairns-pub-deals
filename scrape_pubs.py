@@ -4,6 +4,19 @@ import time
 from google import genai
 from google.genai import types
 
+def extract_json_array_string(text):
+    """
+    Locates the first '[' and last ']' to safely isolate the JSON array block,
+    discarding any markdown formatting tags or conversational text.
+    """
+    text = text.strip()
+    start_idx = text.find('[')
+    end_idx = text.rfind(']')
+    
+    if start_idx != -1 and end_idx != -1 and start_idx < end_idx:
+        return text[start_idx:end_idx + 1]
+    raise ValueError("No JSON array found in the model's response text.")
+
 def get_pub_deals(client, venue_name, url):
     # Extract the domain safely to perform clean site-restricted grounding searches
     domain = url.replace("https://", "").replace("http://", "").split('/')[0]
@@ -34,7 +47,8 @@ def get_pub_deals(client, venue_name, url):
     - Do NOT invent, guess, or extrapolate any deals. If you cannot verify an active food or drink special for a day in any search context, skip that day.
 
     OUTPUT SCHEMA:
-    Return a valid JSON array of objects mapping exactly to this structure:
+    Return ONLY a valid, raw JSON array of objects mapping to this exact schema structure. 
+    Do NOT include any conversational introduction, backticks, or write markdown "```json" blocks around it:
     [
       {{
         "pub": "{venue_name}",
@@ -53,19 +67,21 @@ def get_pub_deals(client, venue_name, url):
         try:
             print(f"Scraping {venue_name} dynamically (Attempt {attempt + 1}/{max_retries})...")
             
-            # Use strongly typed configuration classes for the google-genai SDK
+            # Use strongly typed configuration classes, but WITHOUT response_mime_type
             response = client.models.generate_content(
                 model='gemini-2.5-flash',
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     tools=[types.Tool(google_search=types.GoogleSearch())],
                     temperature=0.0,
-                    response_mime_type="application/json"  # Forces the model to return valid JSON natively
                 ),
             )
             
             raw_text = response.text.strip()
-            parsed_data = json.loads(raw_text)
+            
+            # Clean and isolate the JSON block from any markdown decoration
+            json_string = extract_json_array_string(raw_text)
+            parsed_data = json.loads(json_string)
             
             print(f"Successfully parsed {len(parsed_data)} deals for {venue_name}!")
             return parsed_data
@@ -82,19 +98,18 @@ def get_pub_deals(client, venue_name, url):
     return []
 
 try:
-    # Initialize the client using the new SDK standard
     client = genai.Client()
     all_deals = []
     
-    # Pure URL strings to prevent splitting and grounding query generation crashes
+    # Pure URL strings so the domain regex works properly
     venues = [
         {
             "name": "The Crown Hotel", 
-            "url": "https://www.thecrownhotelcairns.com.au/daily-specials"
+            "url": "[https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials)"
         },
         {
             "name": "Dunwoody's Hotel", 
-            "url": "https://dunwoodys.com.au/whats-on/"
+            "url": "[https://dunwoodys.com.au/whats-on/](https://dunwoodys.com.au/whats-on/)"
         }
     ]
     
