@@ -1,65 +1,110 @@
 [
   {
     "pub": "The Crown Hotel",
-    "location": "Cairns City",
-    "day": "Monday",
-    "deal": "Steak Sandwich, chips & salad",
-    "price": "$18",
-    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
-    "last_updated": "Weekly Feed"
-  },
-  {
-    "pub": "The Crown Hotel",
-    "location": "Cairns City",
-    "day": "Tuesday",
-    "deal": "T-Bone Steak, chips & salad",
-    "price": "$27",
-    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
-    "last_updated": "Weekly Feed"
-  },
-  {
-    "pub": "The Crown Hotel",
-    "location": "Cairns City",
+    "location": "Cairns",
     "day": "Wednesday",
-    "deal": "Fish & chips & salad",
+    "deal": "Burger & Schooner - Any of our burgers, with a schooner of house beer",
     "price": "$20",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
-    "last_updated": "Weekly Feed"
+    "last_updated": "June 2026"
   },
   {
     "pub": "The Crown Hotel",
-    "location": "Cairns City",
+    "location": "Cairns",
+    "day": "Wednesday",
+    "deal": "Wings & Schooner - Chicken wings and a schooner of house beer",
+    "price": "$20",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
     "day": "Thursday",
-    "deal": "Parmy, chips & salad",
+    "deal": "Parmy & Schooner - Our Chicken Parmigiana with a schooner of house beer",
     "price": "$20",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
-    "last_updated": "Weekly Feed"
+    "last_updated": "June 2026"
   },
   {
     "pub": "The Crown Hotel",
-    "location": "Cairns City",
+    "location": "Cairns",
+    "day": "Thursday",
+    "deal": "Wings & Schooner - Chicken wings and a schooner of house beer",
+    "price": "$20",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
     "day": "Friday",
-    "deal": "Rump Steak, chips & salad",
+    "deal": "Steak & Schooner - T-Bone Steak and a schooner of house beer",
+    "price": "$25",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Friday",
+    "deal": "Steak & Schooner - Rump Steak and a schooner of house beer",
     "price": "$22",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
-    "last_updated": "Weekly Feed"
+    "last_updated": "June 2026"
   },
   {
     "pub": "The Crown Hotel",
-    "location": "Cairns City",
-    "day": "Saturday",
-    "deal": "Sirloin, chips & salad",
-    "price": "$27",
-    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
-    "last_updated": "Weekly Feed"
-  },
-  {
-    "pub": "The Crown Hotel",
-    "location": "Cairns City",
-    "day": "Sunday",
-    "deal": "Roast of the Day",
+    "location": "Cairns",
+    "day": "Friday",
+    "deal": "Wings & Schooner - Chicken wings and a schooner of house beer",
     "price": "$20",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
-    "last_updated": "Weekly Feed"
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Saturday",
+    "deal": "Fish n Chips - Fish of the day, chips and a schooner of house beer",
+    "price": "$20",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Saturday",
+    "deal": "Wings & Schooner - Chicken wings and a schooner of house beer",
+    "price": "$20",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Sunday",
+    "deal": "Wings & Schooner - Chicken wings and a schooner of house beer",
+    "price": "$20",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "Dunwoody's Hotel",
+    "location": "Cairns",
+    "day": "Tuesday",
+    "deal": "MONSTER PARMI",
+    "price": "$25",
+    "url": "https://dunwoodys.com.au/whats-on/",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "Dunwoody's Hotel",
+    "location": "Cairns",
+    "day": "Thursday",
+    "deal": "250gm Rump, served with chips, salad & sauce",
+    "price": "$23",
+    "url": "https://dunwoodys.com.au/whats-on/",
+    "last_updated": "June 2026"
   }
 ]
