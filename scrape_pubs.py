@@ -3,30 +3,29 @@ import json
 import time
 from google import genai
 from google.genai import types
+from pydantic import BaseModel, Field
+
+# Define a strict data schema to prevent example matching or hallucination
+class PubDeal(BaseModel):
+    pub: str = Field(description="The formal name of the venue")
+    location: str = Field(description="The suburb or city area, e.g., Cairns City or Cairns North")
+    day: str = Field(description="The day of the week, e.g., Monday")
+    deal: str = Field(description="The exact name of the food meal deal or special drink deal as written on the page")
+    price: str = Field(description="The cost of the deal, including the dollar sign, e.g., $20. If it varies or is not stated, write Varies")
+    url: str = Field(description="The exact source page URL used to scrape this deal")
+    last_updated: str = Field(description="Set this string to 'June 2026'")
 
 def get_pub_deals(client, venue_name, url):
     prompt = f"""
-    Search the web for the exact daily food and drink specials currently listed on the official website 
-    for {venue_name} in Cairns ({url}). 
+    Perform a live web search to locate the official current daily food and drink specials page for {venue_name} in Cairns.
+    Target URL: {url}
     
-    Extract the real, actual meal item and price for each day of the week. 
-    Do not make up or guess any prices. If a day has no specified deal, skip it.
+    Carefully read the text contents of the web page. Extract every specific daily meal or drink special listed for each day.
+    Do not guess, hallucinate, or alter any details. If a specific price is not listed on the page for a deal, label the price as 'Varies'.
     
-    Return ONLY a valid, raw JSON array mapping exactly to this schema structure with no markdown decoration, no ```json tags, and no extra text:
-    [
-      {{
-        "pub": "{venue_name}",
-        "location": "Cairns",
-        "day": "Monday",
-        "deal": "Actual Deal Text Here",
-        "price": "$Actual Price Here",
-        "url": "{url}",
-        "last_updated": "June 2026"
-      }}
-    ]
+    Output a valid list matching the required JSON schema structure containing the true specials.
     """
     
-    # Retry loop configuration (Max 3 attempts if server hits a 503 blip)
     max_retries = 3
     for attempt in range(max_retries):
         try:
@@ -38,15 +37,16 @@ def get_pub_deals(client, venue_name, url):
                 config=types.GenerateContentConfig(
                     tools=[{"google_search": {}}],
                     temperature=0.0,
+                    # Enforces structured output safely without brittle string tricks
+                    response_mime_type="application/json",
+                    response_schema=list[PubDeal],
                 ),
             )
             
-            raw_text = response.text.strip()
-            cleaned = raw_text.replace('```json', '').replace('```', '').strip()
-            return json.loads(cleaned)
+            # Using Structured Output configuration lets us parse directly safely
+            return json.loads(response.text.strip())
             
         except Exception as e:
-            # Check if it looks like a temporary server error
             if "503" in str(e) or "UNAVAILABLE" in str(e):
                 if attempt < max_retries - 1:
                     wait_time = (attempt + 1) * 5
@@ -62,8 +62,8 @@ try:
     all_deals = []
     
     venues = [
-        {"name": "The Crown Hotel", "url": "[https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials)"},
-        {"name": "Dunwoody's Hotel", "url": "[https://dunwoodys.com.au/whats-on/](https://dunwoodys.com.au/whats-on/)"}
+        {"name": "The Crown Hotel", "url": "https://www.thecrownhotelcairns.com.au/daily-specials"},
+        {"name": "Dunwoody's Hotel", "url": "https://dunwoodys.com.au/whats-on/"}
     ]
     
     for venue in venues:
@@ -74,7 +74,7 @@ try:
     with open('public/deals.json', 'w') as f:
         json.dump(all_deals, f, indent=2)
         
-    print(f"Successfully aggregated and updated {len(all_deals)} total deals in public/deals.json!")
+    print(f"Successfully aggregated and updated {len(all_deals)} total verified deals in public/deals.json!")
 
 except Exception as e:
     print(f'Failed execution: {e}')
