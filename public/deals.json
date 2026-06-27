@@ -1,1 +1,110 @@
-[]
+[
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Tuesday",
+    "deal": "$20 T-Bone Tuesday",
+    "price": "$20",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Wednesday",
+    "deal": "Burger & Schooner",
+    "price": "$20",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Wednesday",
+    "deal": "Wings & Schooner - Chicken wings and a schooner of house beer",
+    "price": "$20",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Thursday",
+    "deal": "Parmy & Schooner",
+    "price": "$20",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Thursday",
+    "deal": "Wings & Schooner - Chicken wings and a schooner of house beer",
+    "price": "$20",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Friday",
+    "deal": "Steak & Schooner - T-Bone Steak and a schooner of house beer",
+    "price": "$25",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Friday",
+    "deal": "Steak & Schooner - Rump Steak and a schooner of house beer",
+    "price": "$22",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Friday",
+    "deal": "Pie Day Friday",
+    "price": "Varies",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Friday",
+    "deal": "Wings & Schooner - Chicken wings and a schooner of house beer",
+    "price": "$20",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Saturday",
+    "deal": "Fish n Chips - Fish of the day, chips and a schooner of house beer",
+    "price": "$20",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Saturday",
+    "deal": "Wings & Schooner - Chicken wings and a schooner of house beer",
+    "price": "$20",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Sunday",
+    "deal": "Wings & Schooner - Chicken wings and a schooner of house beer",
+    "price": "$20",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials](https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  }
+]
