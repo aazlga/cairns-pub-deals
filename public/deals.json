@@ -1,1 +1,65 @@
-[]
+[
+  {
+    "pub": "Dunwoody's Hotel",
+    "location": "Cairns",
+    "day": "Monday",
+    "deal": "Kids Eat Free - Get a FREE kids meal with every full-priced main meal purchase from our Salads, Burgers & Sandwiches, Grill or Mains sections, including specials over $20. Available every Monday night from 5:30pm \u2013 8:30pm.",
+    "price": "Free (with qualifying purchase)",
+    "url": "https://dunwoodys.com.au/whats-on/",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "Dunwoody's Hotel",
+    "location": "Cairns",
+    "day": "Tuesday",
+    "deal": "Monster Parmi Tuesday - Massive 350g chicken parmi",
+    "price": "$25",
+    "url": "https://dunwoodys.com.au/whats-on/",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "Dunwoody's Hotel",
+    "location": "Cairns",
+    "day": "Wednesday",
+    "deal": "No specific daily food special listed with a price.",
+    "price": "N/A",
+    "url": "https://dunwoodys.com.au/whats-on/",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "Dunwoody's Hotel",
+    "location": "Cairns",
+    "day": "Thursday",
+    "deal": "Steak Night - 250gm Rump, served with chips, salad & sauce",
+    "price": "$23",
+    "url": "https://dunwoodys.com.au/whats-on/",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "Dunwoody's Hotel",
+    "location": "Cairns",
+    "day": "Friday",
+    "deal": "No specific daily food special listed with a price.",
+    "price": "N/A",
+    "url": "https://dunwoodys.com.au/whats-on/",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "Dunwoody's Hotel",
+    "location": "Cairns",
+    "day": "Saturday",
+    "deal": "No specific daily food special listed with a price.",
+    "price": "N/A",
+    "url": "https://dunwoodys.com.au/whats-on/",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "Dunwoody's Hotel",
+    "location": "Cairns",
+    "day": "Sunday",
+    "deal": "Sunday Roast - Roast of the day with all the trimmings",
+    "price": "$28",
+    "url": "https://dunwoodys.com.au/whats-on/",
+    "last_updated": "June 2026"
+  }
+]
