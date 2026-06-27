@@ -2,9 +2,18 @@
   {
     "pub": "The Crown Hotel",
     "location": "Cairns",
-    "day": "Wednesday",
-    "deal": "Burger & Schooner - Any of our burgers, with a schooner of house beer",
+    "day": "Monday",
+    "deal": "Steak Sandwich, chips & salad",
     "price": "$20",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "The Crown Hotel",
+    "location": "Cairns",
+    "day": "Tuesday",
+    "deal": "T-Bone Tuesday, T-Bone Steak chips & salad",
+    "price": "$29",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
     "last_updated": "June 2026"
   },
@@ -12,8 +21,8 @@
     "pub": "The Crown Hotel",
     "location": "Cairns",
     "day": "Wednesday",
-    "deal": "Wings & Schooner - Chicken wings and schooner of house beer",
-    "price": "$20",
+    "deal": "Fish & Chips, salad",
+    "price": "$24",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
     "last_updated": "June 2026"
   },
@@ -21,17 +30,8 @@
     "pub": "The Crown Hotel",
     "location": "Cairns",
     "day": "Thursday",
-    "deal": "Parmy & Schooner - Our Chicken Parmigiana with a schooner of house beer",
-    "price": "$20",
-    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "The Crown Hotel",
-    "location": "Cairns",
-    "day": "Thursday",
-    "deal": "Wings & Schooner - Chicken wings and schooner of house beer",
-    "price": "$20",
+    "deal": "ParmI, chips & salad",
+    "price": "$24",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
     "last_updated": "June 2026"
   },
@@ -39,7 +39,7 @@
     "pub": "The Crown Hotel",
     "location": "Cairns",
     "day": "Friday",
-    "deal": "Steak & Schooner - T-Bone Steak and a schooner of house beer",
+    "deal": "Rump Steak, chips & salad",
     "price": "$25",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
     "last_updated": "June 2026"
@@ -47,35 +47,8 @@
   {
     "pub": "The Crown Hotel",
     "location": "Cairns",
-    "day": "Friday",
-    "deal": "Steak & Schooner - Rump Steak and a schooner of house beer",
-    "price": "$22",
-    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "The Crown Hotel",
-    "location": "Cairns",
-    "day": "Friday",
-    "deal": "Wings & Schooner - Chicken wings and schooner of house beer",
-    "price": "$20",
-    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "The Crown Hotel",
-    "location": "Cairns",
     "day": "Saturday",
-    "deal": "Fish n Chips - Fish of the day, chips and a schooner of house beer",
-    "price": "$20",
-    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "The Crown Hotel",
-    "location": "Cairns",
-    "day": "Saturday",
-    "deal": "Wings & Schooner - Chicken wings and schooner of house beer",
+    "deal": "Burger & Chips",
     "price": "$20",
     "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
     "last_updated": "June 2026"
@@ -84,27 +57,9 @@
     "pub": "The Crown Hotel",
     "location": "Cairns",
     "day": "Sunday",
-    "deal": "Wings & Schooner - Chicken wings and schooner of house beer",
-    "price": "$20",
-    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "Dunwoody's Hotel",
-    "location": "Cairns",
-    "day": "Tuesday",
-    "deal": "Monster Parmi",
+    "deal": "Roast of the Day",
     "price": "$25",
-    "url": "https://dunwoodys.com.au/whats-on/",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "Dunwoody's Hotel",
-    "location": "Cairns",
-    "day": "Thursday",
-    "deal": "250gm Rump, served with chips, salad & sauce",
-    "price": "$23",
-    "url": "https://dunwoodys.com.au/whats-on/",
+    "url": "https://www.thecrownhotelcairns.com.au/daily-specials",
     "last_updated": "June 2026"
   }
 ]
