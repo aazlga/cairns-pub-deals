@@ -60,6 +60,7 @@ def get_pub_deals(client, venue_name, url):
         try:
             print(f"Scraping {venue_name} dynamically (Attempt {attempt + 1}/{max_retries})...")
             
+            # Using Gemini with Search Grounding enabled (with response_schema omitted to bypass tool conflicts)
             response = client.models.generate_content(
                 model='gemini-2.5-flash',
                 contents=prompt,
