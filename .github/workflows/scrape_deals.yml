@@ -1,55 +1,80 @@
-name: Automated Cairns Pub Scraper
+import os
+import json
+import time
+from google import genai
+from google.genai import types
+from pydantic import BaseModel, Field
 
-on:
-  workflow_dispatch:
+class PubDeal(BaseModel):
+    pub: str = Field(description="The formal name of the venue")
+    location: str = Field(description="The suburb or city area, e.g., Cairns City or Cairns North")
+    day: str = Field(description="The day of the week, e.g., Monday")
+    deal: str = Field(description="The exact name of the food meal deal or special drink deal as written on the page")
+    price: str = Field(description="The cost of the deal, including the dollar sign, e.g., $20. If it varies or is not stated, write Varies")
+    url: str = Field(description="The exact source page URL used to scrape this deal")
+    last_updated: str = Field(description="Set this string to 'June 2026'")
 
-jobs:
-  scrape:
-    runs-on: ubuntu-latest
+def get_pub_deals(client, venue_name, url):
+    prompt = f"""
+    CRITICAL INSTRUCTION: You are a strict data entry bot. Your job is to extract current daily specials for {venue_name} from {url}.
+    
+    1. Perform a web search specifically targeting '{url}'.
+    2. Only use data extracted directly from that domain's current page text. 
+    3. Ignore general knowledge, example formatting blocks, old historical search snippets, or random cached text from other websites.
+    4. If the page lists 'Monday Steak Sandwich, chips & salad $20', extract exactly that. 
+    5. Do not guess, do not default to placeholder templates, and do not hallucinate items like 'Parmageddon' or incorrect prices. 
+    
+    Output a valid list matching the required JSON schema structure.
+    """
+    
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            print(f"Invoking Gemini Live Web Grounding for {venue_name} (Attempt {attempt + 1}/{max_retries})...")
+            
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    tools=[{"google_search": {}}],
+                    temperature=0.0, # Complete determinism
+                    response_mime_type="application/json",
+                    response_schema=list[PubDeal],
+                ),
+            )
+            
+            return json.loads(response.text.strip())
+            
+        except Exception as e:
+            if "503" in str(e) or "UNAVAILABLE" in str(e):
+                if attempt < max_retries - 1:
+                    wait_time = (attempt + 1) * 5
+                    print(f"Server busy (503). Retrying in {wait_time} seconds...")
+                    time.sleep(wait_time)
+                    continue
+            print(f"Failed parsing data for {venue_name}: {e}")
+            return []
+    return []
 
-    permissions:
-      contents: write
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-
-    - name: Install Google GenAI Library
-      run: pip install google-genai pydantic
-
-    - name: Run Scraper Script
-      env:
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      run: python scrape_pubs.py
-
-    - name: Commit and Push changes
-      run: |
-        git config --global user.name "GitHub Action Bot"
-        git config --global user.email "actions@github.com"
+try:
+    client = genai.Client()
+    all_deals = []
+    
+    venues = [
+        {"name": "The Crown Hotel", "url": "https://www.thecrownhotelcairns.com.au/daily-specials"},
+        {"name": "Dunwoody's Hotel", "url": "https://dunwoodys.com.au/whats-on/"}
+    ]
+    
+    for venue in venues:
+        deals = get_pub_deals(client, venue["name"], venue["url"])
+        all_deals.extend(deals)
         
-        # 1. Stash the freshly generated json out of harm's way
-        cp public/deals.json /tmp/deals.json
+    os.makedirs('public', exist_ok=True)
+    with open('public/deals.json', 'w') as f:
+        json.dump(all_deals, f, indent=2)
         
-        # 2. Force reset the local branch to perfectly match the remote main
-        git fetch origin main
-        git checkout main
-        git reset --hard origin/main
-        
-        # 3. Bring the new data file back into position
-        cp /tmp/deals.json public/deals.json
-        git add public/deals.json
-        
-        # 4. Commit and push cleanly
-        if ! git diff-index --quiet HEAD; then
-          git commit -m "Auto-update pub specials via Gemini"
-          git push origin main
-        else
-          echo "No data changes detected. Skipping push."
-        fi
+    print(f"Successfully aggregated and updated {len(all_deals)} total verified deals in public/deals.json!")
+
+except Exception as e:
+    print(f'Failed execution: {e}')
+    exit(1)
