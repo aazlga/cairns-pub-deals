@@ -67,7 +67,6 @@ def get_pub_deals(client, venue_name, url):
         try:
             print(f"Scraping {venue_name} dynamically (Attempt {attempt + 1}/{max_retries})...")
             
-            # Use strongly typed configuration classes, but WITHOUT response_mime_type
             response = client.models.generate_content(
                 model='gemini-2.5-flash',
                 contents=prompt,
@@ -101,7 +100,6 @@ try:
     client = genai.Client()
     all_deals = []
     
-    # Pure URL strings so the domain regex works properly
     venues = [
         {
             "name": "The Crown Hotel", 
@@ -110,6 +108,46 @@ try:
         {
             "name": "Dunwoody's Hotel", 
             "url": "[https://dunwoodys.com.au/whats-on/](https://dunwoodys.com.au/whats-on/)"
+        },
+        {
+            "name": "The Surf Club Palm Cove",
+            "url": "[https://www.surfclubpalmcove.com.au/menu](https://www.surfclubpalmcove.com.au/menu)"
+        },
+        {
+            "name": "Trinity Beach Sports Club",
+            "url": "[https://trinitybeachsportsclub.com.au/dining-bar/dining/](https://trinitybeachsportsclub.com.au/dining-bar/dining/)"
+        },
+        {
+            "name": "Fuller Sports Club",
+            "url": "[https://www.fullersports.com.au/eat-drink/meal-specials/](https://www.fullersports.com.au/eat-drink/meal-specials/)"
+        },
+        {
+            "name": "South Cairns Sports Club",
+            "url": "[https://southcairnssportsclub.com.au/sirens-restaurant/](https://southcairnssportsclub.com.au/sirens-restaurant/)"
+        },
+        {
+            "name": "Crystalbrook Flynn",
+            "url": "[https://www.crystalbrookcollection.com/flynn/offers](https://www.crystalbrookcollection.com/flynn/offers)"
+        },
+        {
+            "name": "Cazalys Cairns",
+            "url": "[https://cazalys.com.au/barassis-restaurant/](https://cazalys.com.au/barassis-restaurant/)"
+        },
+        {
+            "name": "The Parkview Hotel",
+            "url": "[https://www.theparkviewhotel.com.au/whats-on/](https://www.theparkviewhotel.com.au/whats-on/)"
+        },
+        {
+            "name": "Mount Sheridan Tavern",
+            "url": "[https://mountsheridantavern.com.au/whats-on/](https://mountsheridantavern.com.au/whats-on/)"
+        },
+        {
+            "name": "Muddys Cafe",
+            "url": "[https://muddyscafe.com/menu/](https://muddyscafe.com/menu/)"
+        },
+        {
+            "name": "Oaks Cairns Hotel",
+            "url": "[https://www.oakshotels.com/en/oaks-cairns-hotel/offers](https://www.oakshotels.com/en/oaks-cairns-hotel/offers)"
         }
     ]
     
