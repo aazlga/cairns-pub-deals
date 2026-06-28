@@ -1,128 +1,47 @@
 [
   {
-    "pub": "Cazalys Cairns",
-    "location": "Cairns",
-    "day": "Wednesday",
-    "deal": "New Weekly Specials (available for lunch and dinner)",
-    "price": "Varies",
-    "url": "https://cazalys.com.au/barassis-restaurant/",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "Cazalys Cairns",
-    "location": "Cairns",
-    "day": "Thursday",
-    "deal": "New Weekly Specials (available for lunch and dinner)",
-    "price": "Varies",
-    "url": "https://cazalys.com.au/barassis-restaurant/",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "Cazalys Cairns",
-    "location": "Cairns",
-    "day": "Friday",
-    "deal": "New Weekly Specials (available for lunch and dinner)",
-    "price": "Varies",
-    "url": "https://cazalys.com.au/barassis-restaurant/",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "Cazalys Cairns",
-    "location": "Cairns",
-    "day": "Friday",
-    "deal": "Barassis Carvery (three succulent meats, real roast vegetables, seasonal greens, and all the trimmings)",
-    "price": "$25 (members), $27.50 (non-members)",
-    "url": "https://cazalys.com.au/barassis-restaurant/",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "Cazalys Cairns",
-    "location": "Cairns",
-    "day": "Saturday",
-    "deal": "New Weekly Specials (available for lunch and dinner)",
-    "price": "Varies",
-    "url": "https://cazalys.com.au/barassis-restaurant/",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "Cazalys Cairns",
-    "location": "Cairns",
-    "day": "Saturday",
-    "deal": "Barassis Carvery (three succulent meats, real roast vegetables, seasonal greens, and all the trimmings)",
-    "price": "$25 (members), $27.50 (non-members)",
-    "url": "https://cazalys.com.au/barassis-restaurant/",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "Cazalys Cairns",
-    "location": "Cairns",
-    "day": "Sunday",
-    "deal": "New Weekly Specials (available for lunch and dinner)",
-    "price": "Varies",
-    "url": "https://cazalys.com.au/barassis-restaurant/",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "Cazalys Cairns",
-    "location": "Cairns",
-    "day": "Sunday",
-    "deal": "Barassis Carvery (lunch: three succulent meats, real roast vegetables, seasonal greens, and all the trimmings)",
-    "price": "$25 (members), $27.50 (non-members)",
-    "url": "https://cazalys.com.au/barassis-restaurant/",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "Cazalys Cairns",
-    "location": "Cairns",
-    "day": "Sunday",
-    "deal": "Barassis Carvery (dinner: three succulent meats, real roast vegetables, seasonal greens, and all the trimmings)",
-    "price": "$25 (members), $27.50 (non-members)",
-    "url": "https://cazalys.com.au/barassis-restaurant/",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "Cazalys Cairns",
-    "location": "Cairns",
-    "day": "Sunday",
-    "deal": "Free dessert with dinner",
-    "price": "Free",
-    "url": "https://cazalys.com.au/barassis-restaurant/",
-    "last_updated": "June 2026"
-  },
-  {
-    "pub": "Cazalys Cairns",
+    "pub": "Crystalbrook Flynn",
     "location": "Cairns",
     "day": "Monday",
-    "deal": "New Weekly Specials (available for lunch and dinner)",
-    "price": "Varies",
-    "url": "https://cazalys.com.au/barassis-restaurant/",
+    "deal": "$19 Fish and chips",
+    "price": "$19",
+    "url": "https://www.crystalbrookcollection.com/flynn/offers",
     "last_updated": "June 2026"
   },
   {
-    "pub": "Cazalys Cairns",
+    "pub": "Crystalbrook Flynn",
     "location": "Cairns",
     "day": "Tuesday",
-    "deal": "New Weekly Specials (available for lunch and dinner)",
-    "price": "Varies",
-    "url": "https://cazalys.com.au/barassis-restaurant/",
+    "deal": "$19 Any salad",
+    "price": "$19",
+    "url": "https://www.crystalbrookcollection.com/flynn/offers",
     "last_updated": "June 2026"
   },
   {
-    "pub": "Cazalys Cairns",
+    "pub": "Crystalbrook Flynn",
     "location": "Cairns",
-    "day": "Daily",
-    "deal": "Daily lunch specials and Budget Busters",
-    "price": "Varies",
-    "url": "https://cazalys.com.au/barassis-restaurant/",
+    "day": "Wednesday",
+    "deal": "$19 Any burger",
+    "price": "$19",
+    "url": "https://www.crystalbrookcollection.com/flynn/offers",
     "last_updated": "June 2026"
   },
   {
-    "pub": "Cazalys Cairns",
+    "pub": "Crystalbrook Flynn",
     "location": "Cairns",
-    "day": "Daily",
-    "deal": "Kids Meals",
-    "price": "Varies",
-    "url": "https://cazalys.com.au/barassis-restaurant/",
+    "day": "Thursday",
+    "deal": "$19 Chicken schnitzel",
+    "price": "$19",
+    "url": "https://www.crystalbrookcollection.com/flynn/offers",
+    "last_updated": "June 2026"
+  },
+  {
+    "pub": "Crystalbrook Flynn",
+    "location": "Cairns",
+    "day": "Sunday",
+    "deal": "Kids eat free with any adult meal",
+    "price": "Free (With purchase)",
+    "url": "https://www.crystalbrookcollection.com/flynn/offers",
     "last_updated": "June 2026"
   }
 ]
